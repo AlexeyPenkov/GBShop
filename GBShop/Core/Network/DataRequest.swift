@@ -16,12 +16,12 @@ class CustomDecodableSerializer<T: Decodable>: DataResponseSerializerProtocol {
         self.errorParser = errorParser
     }
     
-    func serialize(request: URLRequest?, responce: HTTPURLResponse?, data: Data?, error: Error?) throws -> T {
-        if let error = errorParser.parse(responce: responce, data: data, error: error) {
+    func serialize(request: URLRequest?, response: HTTPURLResponse?, data: Data?, error: Error?) throws -> T {
+        if let error = errorParser.parse(response: response, data: data, error: error) {
             throw error
         }
         do {
-            let data = try DataResponseSerializer().serialize(request: request, response: responce, data: data, error: error)
+            let data = try DataResponseSerializer().serialize(request: request, response: response, data: data, error: error)
             let value = try JSONDecoder().decode(T.self, from: data)
             return value
         } catch {
@@ -38,8 +38,8 @@ extension DataRequest {
         errorParser: AbstractErrorParser,
         queue: DispatchQueue = .main,
         completionHandler: @escaping (AFDataResponse<T>) -> Void) -> Self {
-        let responceSerializer = CustomDecodableSerializer<T>(errorParser: errorParser)
-        return response(queue: queue, responseSerializer: responceSerializer, completionHandler: completionHandler)
+        let responseSerializer = CustomDecodableSerializer<T>(errorParser: errorParser)
+        return response(queue: queue, responseSerializer: responseSerializer, completionHandler: completionHandler)
     }
 }
 
